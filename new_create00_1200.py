@@ -294,8 +294,16 @@ for item_href_categories, number_page in srazy_parsim.items():
                                     car_body = "пикап" 
                             #print(volume, fuel, transmission, engine, car_body)
                             #print(benzik)
-                            another_zap = 0
-
+                            another_zap = ""
+                            count = 0
+                            for zap in list_num_zap:
+                                count +=1
+                            if count > 1:
+                                for zap in list_num_zap:
+                                    another_zap = ""
+                                    for zap_2 in list_num_zap: 
+                                        if zap_2 != zap:
+                                            another_zap = zap_2 + " "
                             file = open(f"00_1200_no_price.csv", "a", encoding="utf-8", newline='')
                             writer = csv.writer(file)
 
