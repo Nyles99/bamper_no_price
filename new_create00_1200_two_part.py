@@ -97,7 +97,7 @@ else:
             )
         )
 
-with open("zapchast00_1200.json", encoding="utf-8") as file:
+with open("zapchast00_1200_one_year.json", encoding="utf-8") as file:
     srazy_parsim = json.load(file)
 nomer_str = 0
 zapchast_in_black_list = 0
