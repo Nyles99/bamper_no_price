@@ -18,7 +18,7 @@ from selenium.webdriver.support.ui import WebDriverWait
     #'http': f'{proxy}',
     #'https': f'{proxy}'
 #}
-input_page = int(input("С какой страницы продолжим?Если сначала- вводи 1 и Enter "))
+input_page = int(input("С какой страницы продолжим?Если сначала- вводи 0 и Enter "))
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 headers = {
@@ -110,7 +110,7 @@ for item_href_categories, number_page in srazy_parsim.items():
     diapazon = item_href_categories[item_href_categories.find("god_")+4:item_href_categories.find("/price-do_")]
     priceh = "price-do_0.5"
     if "isnew_y" in item_href_categories:
-        status = "Новая"
+        status = "новая"
         status_href = "isnew_y"
     else:
         status = "б/у"
@@ -119,12 +119,13 @@ for item_href_categories, number_page in srazy_parsim.items():
     
     for i in range(1, number_page+1):
         item_href_categories = f"https://bamper.by/zchbu/marka_{markah}/god_{diapazon}/{priceh}/{status_href}/?ACTION=REWRITED3&FORM_DATA=marka_{markah}%2Fgod_{diapazon}%2F{priceh}&2F{status_href}&more=Y&PAGEN_1={i}"
-
+        
+        
         
         if nomer_str >= input_page:
             nomer_str += 1
             print(f'Номер страницы {nomer_str} - Внимательно!')
-            print(item_href_categories)
+            #print(item_href_categories)
             try:
                 req = requests.get(url=item_href_categories, headers=headers)
                 src = req.text
@@ -144,7 +145,7 @@ for item_href_categories, number_page in srazy_parsim.items():
                     number_href_reverse = number_href_reverse_second[: number_href_reverse_second.find("/")]
                     name_href = number_href_reverse[::-1]
                     name_href = name_href.replace("*","_").replace('%','_')
-                    print(name_href)
+                    #print(name_href)
                     num_provider = name_href[: name_href.find("-")]
                     print(num_provider)
                     if num_provider not in black_list:
@@ -162,20 +163,22 @@ for item_href_categories, number_page in srazy_parsim.items():
                                 number_b = string.find('</b>')
                                 name_part = string[2:number_b].replace(';',"*#").replace('"',"")
                                 model_and_year = string[string.find(' к ')+3 :]
-                                print(model_and_year)
+                                #print(model_and_year)
                                 marka = model_and_year[: model_and_year.find(" ")].replace(",","").replace('"',"")
                                 model = model_and_year[model_and_year.find(" ")+1 : model_and_year.find(",")].replace(",","").replace('"',"").replace(';',"*#")
+                                model = model[: model.find("(")]
                                 year = model_and_year[model_and_year.find("г.")-5 : model_and_year.find("г.")].replace(",","").replace('"',"")
                             print(marka, model, year)
                             num_zap = " "
                             num_obj = soup.find_all("span", class_="media-heading cut-h-65")
-                            print(num_obj)
+                            #print(num_obj)
                             for item_num in num_obj:
                                 num_zap = str(item_num.text).replace("  ","").replace('"',"")
                                 num_zap = num_zap.replace(",","").replace("\n","")
                                 num_zap = num_zap.replace("далее","").replace(';',"*#")
-                            print(num_zap)    
+                            print(num_zap, "Номер запчасти")    
                             list_num_zap = num_zap.split()
+                            print(list_num_zap, "Список номеров")
                             
                             artical_obj = soup.find_all("span", class_="data-type f13")
                             for item_artical in artical_obj:
@@ -199,7 +202,8 @@ for item_href_categories, number_page in srazy_parsim.items():
                             preorder = soup.find_all("div", class_="preorder ")
                             for item_preorder in preorder:
                                 if "под заказ" in item_preorder:
-                                    order = "ПОД ЗАКАЗ"   
+                                    order = "ПОД ЗАКАЗ"  
+                            print(order) 
                             #print(status)
                             #print(order)        
                             #print(info)
@@ -294,42 +298,72 @@ for item_href_categories, number_page in srazy_parsim.items():
                                     car_body = "пикап" 
                             #print(volume, fuel, transmission, engine, car_body)
                             #print(benzik)
-                            another_zap = ""
+                            #another_zap = ""
                             count = 0
+                            #if list_num_zap != []:
                             for zap in list_num_zap:
                                 count +=1
+                            print("До сюда дошло!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+                            
                             if count > 1:
+                                
                                 for zap in list_num_zap:
-                                    another_zap = ""
-                                    for zap_2 in list_num_zap: 
-                                        if zap_2 != zap:
-                                            another_zap = zap_2 + " "
-                            file = open(f"00_1200_no_price.csv", "a", encoding="utf-8", newline='')
-                            writer = csv.writer(file)
+                                    another_zap = another_zap + " " + zap 
+                                for zap in list_num_zap: 
+                                    file = open(f"00_1200_no_price.csv", "a", encoding="utf-8", newline='')
+                                    writer = csv.writer(file)
 
-                            writer.writerow(
-                                (
-                                    href_to_zapchast,
-                                    price,
-                                    price+"_PB"+num_provider,
-                                    artical,
-                                    name_part,
-                                    marka,
-                                    model,
-                                    year,
-                                    volume,
-                                    fuel,
-                                    car_body,
-                                    num_zap,
-                                    another_zap,
-                                    info,
-                                    order,
-                                    status,
-                                    foto,
-                                    nomer_str                                   
+                                    writer.writerow(
+                                        (
+                                            href_to_zapchast,
+                                            price,
+                                            "0"+"_PB"+num_provider,
+                                            artical,
+                                            name_part,
+                                            marka,
+                                            model,
+                                            year,
+                                            volume,
+                                            fuel,
+                                            car_body,
+                                            zap,
+                                            another_zap,
+                                            info,
+                                            order,
+                                            status,
+                                            foto,
+                                            nomer_str                                   
+                                        )
+                                    )
+                                    file.close()
+                            else:
+                                another_zap = " "
+                                file = open(f"00_1200_no_price.csv", "a", encoding="utf-8", newline='')
+                                writer = csv.writer(file)
+
+                                writer.writerow(
+                                    (
+                                        href_to_zapchast,
+                                        price,
+                                        "0"+"_PB"+num_provider,
+                                        artical,
+                                        name_part,
+                                        marka,
+                                        model,
+                                        year,
+                                        volume,
+                                        fuel,
+                                        car_body,
+                                        num_zap,
+                                        another_zap,
+                                        info,
+                                        order,
+                                        status,
+                                        foto,
+                                        nomer_str                                   
+                                    )
                                 )
-                            )
-                            file.close()
+                                file.close()
                             #os.remove(f"{name_href}.html")
                             with requests.request("POST", href_to_zapchast, headers=headers) as report:
                                 print('report: ', report)
